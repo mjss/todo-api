@@ -1,0 +1,31 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "BMaJDqifvwJ5LWPOiZn9Rjet/94=",
+			"path": "github.com/gin-gonic/gin",
+			"revision": "6d913fc343cfac80d656db5be67a0ffb1323ba0d",
+			"revisionTime": "2018-03-29T06:33:07Z"
+		},
+		{
+			"checksumSHA1": "lYUMiQOLvV+Okxcm1RQnot+c0ho=",
+			"path": "github.com/jinzhu/gorm",
+			"revision": "52c5c8127cf4aeffde3e0aa9222640832075a90f",
+			"revisionTime": "2018-03-15T14:35:31Z"
+		},
+		{
+			"checksumSHA1": "4eelJOSLZoDzLuaJvgilOBVNovU=",
+			"path": "github.com/jinzhu/inflection",
+			"revision": "04140366298a54a039076d798123ffa108fff46c",
+			"revisionTime": "2018-03-08T03:36:59Z"
+		},
+		{
+			"checksumSHA1": "UXD6iorzeLXDBmLaOGYsAJ/Ls3w=",
+			"path": "github.com/mattn/go-sqlite3",
+			"revision": "d896508f87298565da02ed92730e7065c3de10b8",
+			"revisionTime": "2018-04-04T14:27:34Z"
+		}
+	],
+	"rootPath": "local/todo-api"
+}

@@ -1,2 +1,12 @@
+#  vendor
 vendor/*
 !vendor/vendor.json
+
+# sqlite
+*.db
+
+# binary
+todo-api
+
+# secrect
+secrect

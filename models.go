@@ -5,7 +5,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
-type User struct {
+type Users struct {
 	gorm.Model
 	Name     string
 	Email    string `gorm:"type:varchar(100);unique_index"`

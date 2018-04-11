@@ -1,36 +1,25 @@
 package main
 
 import (
-	"errors"
-	"regexp"
-	"strings"
+	"golang.org/x/crypto/bcrypt"
 )
 
-var ErrInvalidEmail = errors.New("invalid email")
-var ErrPasswordTooShort = errors.New("password to short")
-var ErrEmptyName = errors.New("empty name")
-var emailRegexp = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+func hashPassword(password string) string {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
 
-func isValidEmail(email string) error {
-	if !emailRegexp.MatchString(email) {
-		return ErrInvalidEmail
+	if err != nil {
+		panic(err)
 	}
 
-	return nil
+	return string(hash)
 }
 
-func isValidPassword(password string) error {
-	if len(password) < 6 {
-		return ErrPasswordTooShort
+func verifyPassword(storedHash string, password string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(storedHash), []byte(password))
+
+	if err != nil {
+		return false
 	}
 
-	return nil
-}
-
-func isValidName(name string) error {
-	if name == "" {
-		return ErrEmptyName
-	}
-
-	return nil
+	return true
 }

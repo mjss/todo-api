@@ -1,9 +1,10 @@
 package main
 
 import (
+	"strings"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"strings"
 )
 
 func Cors() gin.HandlerFunc {
@@ -18,14 +19,14 @@ func JwtAuth() gin.HandlerFunc {
 		authHeader := c.Request.Header.Get("Authorization")
 
 		if authHeader == "" {
-			c.AbortWithStatus(403)
+			c.AbortWithStatusJSON(403, BuildErrorJson(ErrNoAuthHeader))
 			return
 		}
 
 		parts := strings.SplitN(authHeader, " ", 2)
 
-		if !(len(parts) != 2 && parts[0] != "Bearer") {
-			c.AbortWithStatus(403)
+		if len(parts) != 2 || parts[0] != "Bearer" {
+			c.AbortWithStatusJSON(403, BuildErrorJson(ErrNoBearer))
 			return
 		}
 
@@ -35,13 +36,13 @@ func JwtAuth() gin.HandlerFunc {
 		})
 
 		if tokenParseErr != nil {
-			c.AbortWithStatus(403)
+			c.AbortWithStatusJSON(403, BuildErrorJson(tokenParseErr))
 			return
 		}
 
 		claims := token.Claims.(jwt.MapClaims)
 
-		id := claims["id"].(string)
+		id := int(claims["id"].(float64))
 
 		c.Set("user_id", id)
 

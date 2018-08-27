@@ -1,9 +1,10 @@
 package main
 
 import (
+	"time"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"time"
 )
 
 // curl -i -X POST -H "Content-Type: application/json" -d "{ \"email\": \"sunminjie91@gmail.com\", \"password\": \"12345678\", \"name\": \"Sun Minjie\" }" http://localhost:8080/api/v1/users
@@ -12,7 +13,7 @@ func CreateUser(c *gin.Context) {
 
 	defer db.Close()
 
-	var user Users
+	var user User
 	c.Bind(&user)
 
 	emailErr := validateEmail(user.Email)
@@ -45,7 +46,7 @@ func GetUser(c *gin.Context) {
 	defer db.Close()
 
 	id := c.Params.ByName("id")
-	var user Users
+	var user User
 	db.Where("ID = ?", id).First(&user)
 
 	if user.ID != 0 {
@@ -53,7 +54,6 @@ func GetUser(c *gin.Context) {
 	} else {
 		c.AbortWithStatusJSON(404, BuildErrorJson(ErrUserNotFound))
 	}
-
 }
 
 // curl -i -X POST -H "Content-Type: application/json" -d "{ \"email\": \"sunminjie91+1@gmail.com\", \"password\": \"12345678\" }" http://localhost:8080/api/v1/login
@@ -62,8 +62,8 @@ func LoginUser(c *gin.Context) {
 
 	defer db.Close()
 
-	cred := &Users{}
-	var user Users
+	cred := &User{}
+	var user User
 	c.Bind(cred)
 	db.Where("Email = ?", cred.Email).First(&user)
 
@@ -73,7 +73,7 @@ func LoginUser(c *gin.Context) {
 		return
 	}
 
-	expire := time.Now().Add(time.Hour)
+	expire := time.Now().Add(time.Hour * 720)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":  user.ID,
 		"exp": expire.Unix(),
@@ -91,4 +91,50 @@ func LoginUser(c *gin.Context) {
 		"token":  tokenString,
 		"expire": expire.Unix(),
 	})
+}
+
+func CreateTask(c *gin.Context) {
+	db := InitDB()
+
+	defer db.Close()
+
+	var task Task
+	bindErr := c.Bind(&task)
+
+	titleErr := validateTitle(task.Title)
+	descriptionErr := validatePassword(task.Description)
+
+	if bindErr != nil {
+		c.AbortWithStatusJSON(400, BuildErrorJson(bindErr))
+		return
+	}
+
+	if titleErr != nil {
+		c.AbortWithStatusJSON(400, BuildErrorJson(titleErr))
+		return
+	}
+
+	if descriptionErr != nil {
+		c.AbortWithStatusJSON(400, BuildErrorJson(descriptionErr))
+		return
+	}
+
+	task.UserID = c.MustGet("user_id").(int)
+
+	db.Create(&task)
+
+	c.JSON(201, BuildTaskJson(task))
+}
+
+func GetTasks(c *gin.Context) {
+	db := InitDB()
+
+	defer db.Close()
+
+	userID := c.MustGet("user_id").(int)
+
+	var tasks []Task
+	db.Where("user_id = ?", userID).First(&tasks)
+
+	c.JSON(200, tasks)
 }

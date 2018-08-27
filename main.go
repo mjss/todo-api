@@ -24,6 +24,8 @@ func setupRouter() *gin.Engine {
 		private := v1.Group("")
 		private.Use(JwtAuth())
 		private.GET("/users/:id", GetUser)
+		private.POST("/tasks", CreateTask)
+		private.GET("/tasks", GetTasks)
 	}
 
 	return router

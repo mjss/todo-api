@@ -29,3 +29,23 @@ func validateName(name string) error {
 
 	return nil
 }
+
+func validateTitle(title string) error {
+	if len(title) > 255 {
+		return ErrTitleTooLong
+	}
+
+	if title == "" {
+		return ErrMissingTitle
+	}
+
+	return nil
+}
+
+func validateDescription(description string) error {
+	if len(description) > 2048 {
+		return ErrDescriptionTooLong
+	}
+
+	return nil
+}

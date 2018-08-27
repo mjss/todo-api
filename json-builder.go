@@ -21,9 +21,25 @@ type JUser struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 }
 
-func BuildUserJson(u Users) JUser {
+func BuildUserJson(u User) JUser {
 	return JUser{
 		Email: u.Email,
 		Name:  u.Name,
+	}
+}
+
+type JTask struct {
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	Completed   bool      `json:"completed"`
+	CreatedAt   time.Time `json:"created_at,omitempty"`
+	UpdatedAt   time.Time `json:"updated_at,omitempty"`
+}
+
+func BuildTaskJson(t Task) JTask {
+	return JTask{
+		Title:       t.Title,
+		Description: t.Description,
+		Completed:   t.Completed,
 	}
 }

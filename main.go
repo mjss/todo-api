@@ -26,6 +26,8 @@ func setupRouter() *gin.Engine {
 		private.GET("/users/:id", GetUser)
 		private.POST("/tasks", CreateTask)
 		private.GET("/tasks", GetTasks)
+		private.PUT("/tasks/:id", UpdateTask)
+		private.DELETE("/tasks/:id", DeleteTask)
 	}
 
 	return router

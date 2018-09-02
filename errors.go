@@ -26,3 +26,6 @@ var ErrDescriptionTooLong = errors.New("Description too long")
 
 // db
 var ErrDb = errors.New("Database returned an error")
+
+// tasks
+var ErrTaskNotFound = errors.New("task not found")

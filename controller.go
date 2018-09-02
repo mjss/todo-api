@@ -102,7 +102,7 @@ func CreateTask(c *gin.Context) {
 	bindErr := c.Bind(&task)
 
 	titleErr := validateTitle(task.Title)
-	descriptionErr := validatePassword(task.Description)
+	descriptionErr := validateDescription(task.Description)
 
 	if bindErr != nil {
 		c.AbortWithStatusJSON(400, BuildErrorJson(bindErr))
@@ -121,9 +121,16 @@ func CreateTask(c *gin.Context) {
 
 	task.UserID = c.MustGet("user_id").(int)
 
-	db.Create(&task)
+	cursor := db.Create(&task)
+	dbErr := cursor.Error
 
-	c.JSON(201, BuildTaskJson(task))
+	if dbErr != nil {
+		c.AbortWithStatusJSON(500, BuildErrorJson(dbErr))
+		return
+	}
+
+	row := cursor.Value
+	c.JSON(201, row)
 }
 
 func GetTasks(c *gin.Context) {
@@ -134,7 +141,44 @@ func GetTasks(c *gin.Context) {
 	userID := c.MustGet("user_id").(int)
 
 	var tasks []Task
-	db.Where("user_id = ?", userID).First(&tasks)
+	db.Where("user_id = ?", userID).Find(&tasks)
 
 	c.JSON(200, tasks)
+}
+
+func UpdateTask(c *gin.Context) {
+	db := InitDB()
+	defer db.Close()
+
+	var task Task
+	taskID := c.Params.ByName("id")
+	userID := c.MustGet("user_id").(int)
+
+	if err := db.Where("id = ? AND user_id = ?", taskID, userID).First(&task).Error; err != nil {
+		c.AbortWithStatusJSON(404, BuildErrorJson(ErrTaskNotFound))
+		return
+	}
+
+	c.BindJSON(&task)
+	db.Save(&task)
+	c.JSON(200, task)
+}
+
+func DeleteTask(c *gin.Context) {
+	db := InitDB()
+	defer db.Close()
+
+	var task Task
+	taskID := c.Params.ByName("id")
+	userID := c.MustGet("user_id").(int)
+
+	if err := db.Where("id = ? AND user_id = ?", taskID, userID).First(&task).Error; err != nil {
+		c.AbortWithStatusJSON(404, BuildErrorJson(ErrTaskNotFound))
+		return
+	}
+
+	db.Delete(&task)
+	c.JSON(200, gin.H{
+		taskID: "ok",
+	})
 }
